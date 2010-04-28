@@ -18,9 +18,18 @@
 
 @import <Foundation/Foundation.j>
 @import <AppKit/AppKit.j>
- 
-TNGrowlViewWillRemoveViewNotification   = @"TNGrowlViewWillRemoveViewNotification";
 
+/*! @global
+    @group TNGrowlNotification
+    The notification sent when life time is over
+*/
+TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNotification";
+
+
+/*! @ingroup growlcappuccino
+    This class represent a single growl notification view
+    You should never use this class directly
+*/
 @implementation TNGrowlView : CPView
 {
     CPImageView _icon;
@@ -30,16 +39,25 @@ TNGrowlViewWillRemoveViewNotification   = @"TNGrowlViewWillRemoveViewNotificatio
     float       _lifeTime;
 }
 
+/*! intialize the TNGrowlView
+    @param aFrame the frame of the view
+    @param aTitle the title of the TNGrowlView
+    @param aMessage the message of the TNGrowlView
+    @param anIcon the icon of the TNGrowlView
+    @param aLifeTime the life time of TNGrowlView
+    @param aBackground the background of TNGrowlView
+    @return initialized instance of TNGrowlView
+*/
 - (id)initWithFrame:(CPRect)aFrame title:(CPString)aTitle message:(CPString)aMessage icon:(CPImage)anIcon lifeTime:(float)aLifeTime background:(CPColor)aBackground
 {
     if (self = [super initWithFrame:aFrame])
     {
         _lifeTime   = aLifeTime;
-        _icon       = [[CPImageView alloc] initWithFrame:CGRectMake(8, 8, 64, 64)];
-        _title      = [[CPTextField alloc] initWithFrame:CGRectMake(78, 5, aFrame.size.width - 78, 20)];
-        _message    = [[CPTextField alloc] initWithFrame:CGRectMake(78, 20, aFrame.size.width - 78, aFrame.size.height - 25)];
+        _icon       = [[CPImageView alloc] initWithFrame:CGRectMake(5, 6, 36, 36)];
+        _title      = [[CPTextField alloc] initWithFrame:CGRectMake(44, 5, aFrame.size.width - 44, 20)];
+        _message    = [[CPTextField alloc] initWithFrame:CGRectMake(44, 20, aFrame.size.width - 44, aFrame.size.height - 25)];
 
-
+        [_icon setImageScaling:CPScaleProportionally];
         [_icon setImage:anIcon];
         [_icon setBorderRadius:5];
         [_title setStringValue:aTitle];
@@ -65,6 +83,8 @@ TNGrowlViewWillRemoveViewNotification   = @"TNGrowlViewWillRemoveViewNotificatio
     return self;
 }
 
+/*! if mouse clicked, set life time to 0
+*/
 - (void)mouseDown:(CPEvent)anEvent
 {
     if ([anEvent type] == CPLeftMouseDown)
@@ -76,6 +96,10 @@ TNGrowlViewWillRemoveViewNotification   = @"TNGrowlViewWillRemoveViewNotificatio
     [super mouseDown:anEvent];
 }
 
+/*! if Info.plist parameter TNGrowlUseMouseMoveEvents is set to 1
+    this will stop the life time counting (ie let the notification displayed if
+    mouse is over)
+*/
 - (void)mouseEntered:(CPEvent)anEvent
 {
     if ([anEvent type] == CPMouseEntered)
@@ -87,6 +111,9 @@ TNGrowlViewWillRemoveViewNotification   = @"TNGrowlViewWillRemoveViewNotificatio
     [super mouseEntered:anEvent];
 }
 
+/*! if Info.plist parameter TNGrowlUseMouseMoveEvents is set to 1
+    this will relaunch the life time counting when mouse is out
+*/
 - (void)mouseExited:(CPEvent)anEvent
 {
     if ([anEvent type] == CPMouseExited)
@@ -97,11 +124,14 @@ TNGrowlViewWillRemoveViewNotification   = @"TNGrowlViewWillRemoveViewNotificatio
     [super mouseExited:anEvent];
 }
 
+/*! can be triggered by timer or by mouseDown: message
+    post the notification that the life time has expired.
+*/
 - (void)willBeRemoved:(CPTimer)aTimer
 {
     var center = [CPNotificationCenter defaultCenter];
 
-    [center postNotificationName:TNGrowlViewWillRemoveViewNotification object:self];
+    [center postNotificationName:TNGrowlViewLifeTimeExpirationNotification object:self];
 }
 
 @end

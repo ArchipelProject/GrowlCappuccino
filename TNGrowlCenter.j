@@ -21,15 +21,73 @@
 
 @import "TNGrowlView.j";
 
-TNGrowlDefaultDisplayTime               = 5.0;
-
+/*! @global
+    @group TNGrowl
+    the defaultCenter pointer
+*/
 TNGrowlDefaultCenter                    = nil;
 
+/*! @global
+    @group TNGrowlIcon
+    icon identitier for Info
+*/
 TNGrowlIconInfo     = @"TNGrowlIconInfo";
+
+/*! @global
+    @group TNGrowlIcon
+    icon identitier for Error
+*/
 TNGrowlIconError    = @"TNGrowlIconError";
+
+/*! @global
+    @group TNGrowlIcon
+    icon identitier for Warning
+*/
 TNGrowlIconWarning  = @"TNGrowlIconWarning";
+
+/*! @global
+    @group TNGrowlIcon
+    icon identitier for custom icon
+*/
 TNGrowlIconCustom   = @"TNGrowlIconCustom";
 
+/*! @global
+    @group TNGrowlPlacement
+    the height of TNGrowlView
+*/
+TNGrowlPlacementWidth           = 250.0
+
+/*! @global
+    @group TNGrowlPlacement
+    the width of TNGrowlView
+*/
+TNGrowlPlacementHeight          = 80.0
+
+/*! @global
+    @group TNGrowlPlacement
+    the margin top value
+*/
+TNGrowlPlacementMarginTop       = 10.0;
+
+/*! @global
+    @group TNGrowlPlacement
+    the margin top right
+*/
+TNGrowlPlacementMarginRight     = 10.0;
+
+/*! @global
+    @group TNGrowlAnimation
+    Duration of fade in and fade out CPViewAnimation
+*/
+TNGrowlAnimationDuration    = 0.3;
+
+
+
+/*! @ingroup growlcappuccino
+    this is the GrowlCappuccino notification center. This is from where you can post Growl notification.
+    it provide a class method defaultCenter: that return the default GrowlCappuccino center.
+    In the most of the case you should use this default center
+*/
 @implementation TNGrowlCenter : CPObject
 {
     float       _defaultLifeTime    @accessors(getter=lifeDefaultTime, setter=setDefaultLifeTime:);
@@ -44,6 +102,9 @@ TNGrowlIconCustom   = @"TNGrowlIconCustom";
     Boolean     _useWindowMouseMoveEvents;
 }
 
+/*! return the defaultCenter
+    @return TNGrowlCenter the default center;
+*/
 + (id)defaultCenter
 {
     if (!TNGrowlDefaultCenter)
@@ -52,31 +113,49 @@ TNGrowlIconCustom   = @"TNGrowlIconCustom";
     return TNGrowlDefaultCenter;
 }
 
+/*! initialize the class
+    @return the initialized instance of TNGrowlCenter
+*/
 - (id)init
 {
     if (self = [super init])
     {
-        var bundle = [CPBundle bundleForClass:[self class]];
+        var bundle          = [CPBundle bundleForClass:[self class]];
+        var backgroundImage = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"background.png"]];
         
-        _notifications      = [CPArray array];
-        _notificationFrame  = CGRectMake(10,10,250,80);
-        _defaultLifeTime    = [bundle objectForInfoDictionaryKey:@"TNGrowlDefaultLifeTime"];
-        _iconInfo           = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-info.png"]];
-        _iconError          = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-error.png"]];
-        _iconWarning        = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-warning.png"]];
-        _backgroundColor    = [CPColor colorWithPatternImage:[[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"background.png"]]];
-        
-        _useWindowMouseMoveEvents = [bundle objectForInfoDictionaryKey:@"TNGrowlUseMouseMoveEvents"];
+        _notifications              = [CPArray array];
+        _notificationFrame          = CGRectMake(10,10, TNGrowlPlacementWidth,TNGrowlPlacementHeight);
+        _defaultLifeTime            = [bundle objectForInfoDictionaryKey:@"TNGrowlDefaultLifeTime"];
+        _iconInfo                   = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-info.png"]];
+        _iconError                  = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-error.png"]];
+        _iconWarning                = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-warning.png"]];
+        _backgroundColor            = [CPColor colorWithPatternImage:backgroundImage];
+        _useWindowMouseMoveEvents   = [bundle objectForInfoDictionaryKey:@"TNGrowlUseMouseMoveEvents"];
     }
     
     return self;
 }
 
+/*! display a notification with type TNGrowlIconInfo
+    @param aTitle the title of the notification
+    @param aMessage the mesage of the notification
+*/
 - (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage
 {
     [self pushNotificationWithTitle:aTitle message:aMessage icon:TNGrowlIconInfo];
 }
 
+/*! display a notification with given type
+    anIconType can be:
+     - TNGrowlIconInfo
+     - TNGrowlIconError
+     - TNGrowlIconWarning
+     - TNGrowlIconCustom
+    
+    @param aTitle the title of the notification
+    @param aMessage the mesage of the notification
+    @param anIconType a type of icon.
+*/
 - (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage icon:(CPString)anIconType
 {
     var icon;
@@ -110,7 +189,7 @@ TNGrowlIconCustom   = @"TNGrowlIconCustom";
     var animParams  = [CPDictionary dictionaryWithObjectsAndKeys:notifView, CPViewAnimationTargetKey, CPViewAnimationFadeInEffect, CPViewAnimationEffectKey];
     var anim        = [[CPViewAnimation alloc] initWithViewAnimations:[animParams]];
     
-    [center addObserver:self selector:@selector(didReceivedNotificationEndLifeTime:) name:TNGrowlViewWillRemoveViewNotification object:notifView];
+    [center addObserver:self selector:@selector(didReceivedNotificationEndLifeTime:) name:TNGrowlViewLifeTimeExpirationNotification object:notifView];
     
     for (var i = 0; i < [_notifications count]; i++)
     {
@@ -130,10 +209,10 @@ TNGrowlIconCustom   = @"TNGrowlIconCustom";
         if (!isViewInThisFrame)
             break;
         
-        notifFrame.origin.y += _notificationFrame.size.height + 10;
+        notifFrame.origin.y += _notificationFrame.size.height + TNGrowlPlacementMarginTop;
     }
     
-    notifFrame.origin.x = frame.size.width - _notificationFrame.size.width - 20;
+    notifFrame.origin.x = frame.size.width - _notificationFrame.size.width - TNGrowlPlacementMarginRight;
     
     [_notifications addObject:notifView];
     
@@ -145,6 +224,10 @@ TNGrowlIconCustom   = @"TNGrowlIconCustom";
     [anim startAnimation];
 }
 
+/*! Responder of the message TNGrowlViewLifeTimeExpirationNotification
+    this will start fade out the TNGrowlView that sent the notification
+    @param aNotification the notification
+*/
 - (void)didReceivedNotificationEndLifeTime:(CPNotification)aNotification
 {
     var center      = [CPNotificationCenter defaultCenter];
@@ -152,13 +235,17 @@ TNGrowlIconCustom   = @"TNGrowlIconCustom";
     var animView    = [CPDictionary dictionaryWithObjectsAndKeys:senderView, CPViewAnimationTargetKey, CPViewAnimationFadeOutEffect, CPViewAnimationEffectKey];
     var anim        = [[CPViewAnimation alloc] initWithViewAnimations:[animView]];
 
-    [center removeObserver:self name:TNGrowlViewWillRemoveViewNotification object:senderView];
+    [center removeObserver:self name:TNGrowlViewLifeTimeExpirationNotification object:senderView];
 
-    [anim setDuration:0.3];
+    [anim setDuration:TNGrowlAnimationDuration];
     [anim setDelegate:self];
     [anim startAnimation];
 }
 
+/*! delegate of CPAnimation. Will remove définitly the TNGrowlView
+    from the superview
+    @param anAnimation the animation that have ended
+*/
 - (void)animationDidEnd:(CPAnimation)anAnimation
 {
     var senderView = [[[anAnimation viewAnimations] objectAtIndex:0] objectForKey:CPViewAnimationTargetKey];

@@ -18,3 +18,18 @@
 
 @import "TNGrowlCenter.j";
 @import "TNGrowlView.j";
+
+/*! @mainpage
+    GrowlCappuccino is distributed under the @ref license "AGPL".
+
+    @htmlonly <pre>@endhtmlonly
+    @htmlinclude README
+    @htmlonly </pre>@endhtmlonly
+
+    @page license License
+    @htmlonly <pre>@endhtmlonly
+    @htmlinclude LICENSE
+    @htmlonly </pre>@endhtmlonly
+
+    @defgroup growlcappuccino GrowlCappuccino
+*/
