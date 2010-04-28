@@ -1,0 +1,27 @@
+<h2>Growl Cappuccino</h2>
+------------------
+
+<h3>What is StropheCappuccino ?</h3>
+---------------------------
+<p>This is a class that allows to mimic Growl notificatiom system in Cappuccino</p>
+
+<h3>Quick Start</h3>
+-----------
+<p>Simply include the GrowlCappuccino framework in your Frameworks directory and include GrowlCappuccino.js</p>
+<code>
+@import <GrowlCappuccino/GrowlCappuccino.j>
+
+[...]
+
+var growl = [TNGrowlCenter defaultCenter];
+
+[grow setView:aView];
+[growl pushNotificationWithTitle:@"Hello" message:@"Hello World!"];
+
+[...]
+</code>
+
+<h3>Documentation</h3>
+<p>To generate the documentation execute the following :</p>
+
+# doxygen GrowlCappuccino.doxygen
