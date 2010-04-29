@@ -11,7 +11,7 @@
 	<key>CPBundlePackageType</key>
 	<string>FMWK</string>
 	<key>TNGrowlUseMouseMoveEvents</key>
-	<integer>0</integer>
+	<integer>1</integer>
 	<key>TNGrowlDefaultLifeTime</key>
 	<integer>5</integer>
 </dict>

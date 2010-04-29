@@ -86,7 +86,12 @@ TNGrowlAnimationDuration    = 0.3;
 /*! @ingroup growlcappuccino
     this is the GrowlCappuccino notification center. This is from where you can post Growl notification.
     it provide a class method defaultCenter: that return the default GrowlCappuccino center.
-    In the most of the case you should use this default center
+    In the most of the case you should use this default center.
+    
+    You can find two option to set in Info.plist
+     - TNGrowlUseMouseMoveEvents : 1 or 0. Default: 0. If 1, GrowlCappuccino will set acceptsMouseMovedEvents: to the _view's window. this
+     will allow to stop life time counting on mouse over, but it can affect the whole application performance
+     - TNGrowlDefaultLifeTime : in seconds. Deafult: 5. The lifeTime of notification.
 */
 @implementation TNGrowlCenter : CPObject
 {
@@ -160,9 +165,6 @@ TNGrowlAnimationDuration    = 0.3;
 {
     var icon;
     
-    if (_useWindowMouseMoveEvents && ![[_view window] acceptsMouseMovedEvents])
-        [[_view window] setAcceptsMouseMovedEvents:YES];
-    
     switch (anIconType)
     {
         case TNGrowlIconInfo:
@@ -182,15 +184,31 @@ TNGrowlAnimationDuration    = 0.3;
             break;
     }
     
+    [self pushNotificationWithTitle:aTitle message:aMessage customIcon:icon];
+}
+
+/*! display a notification with a CPImage as icon.
+    @param aTitle the title of the notification
+    @param aMessage the mesage of the notification
+    @param anIcon a CPImage representing the notification icon
+*/
+- (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage customIcon:(CPImage)anIcon
+{
     var center      = [CPNotificationCenter defaultCenter];
-    var notifView   = [[TNGrowlView alloc] initWithFrame:_notificationFrame title:aTitle message:aMessage icon:icon lifeTime:_defaultLifeTime background:_backgroundColor];
+    var notifView   = [[TNGrowlView alloc] initWithFrame:_notificationFrame title:aTitle message:aMessage icon:anIcon lifeTime:_defaultLifeTime background:_backgroundColor];
     var frame       = [_view frame];
     var notifFrame  = CPRectCreateCopy(_notificationFrame);
     var animParams  = [CPDictionary dictionaryWithObjectsAndKeys:notifView, CPViewAnimationTargetKey, CPViewAnimationFadeInEffect, CPViewAnimationEffectKey];
     var anim        = [[CPViewAnimation alloc] initWithViewAnimations:[animParams]];
     
+    if (_useWindowMouseMoveEvents && ![[_view window] acceptsMouseMovedEvents])
+        [[_view window] setAcceptsMouseMovedEvents:YES];
+    
     [center addObserver:self selector:@selector(didReceivedNotificationEndLifeTime:) name:TNGrowlViewLifeTimeExpirationNotification object:notifView];
     
+    notifFrame.origin.x = frame.size.width - _notificationFrame.size.width - TNGrowlPlacementMarginRight;
+    notifFrame.origin.y = TNGrowlPlacementMarginTop;
+     
     for (var i = 0; i < [_notifications count]; i++)
     {
         var isViewInThisFrame = NO;
@@ -199,23 +217,28 @@ TNGrowlAnimationDuration    = 0.3;
         {
             var tmpFrame = [[_notifications objectAtIndex:j] frame];
             
-            if (notifFrame.origin.y == tmpFrame.origin.y)
+            if (CPRectEqualToRect(notifFrame, tmpFrame))//((notifFrame.origin.y == tmpFrame.origin.y) && (notifFrame.origin.x == tmpFrame.origin.x))
             {
                 isViewInThisFrame = YES;
-                
                 break;
             }
         }
+        
         if (!isViewInThisFrame)
             break;
         
-        notifFrame.origin.y += _notificationFrame.size.height + TNGrowlPlacementMarginTop;
+        notifFrame.origin.y += _notificationFrame.size.height + TNGrowlPlacementMarginTop;    
+
+        if ((notifFrame.origin.y + notifFrame.size.height) >= frame.size.height)
+        {
+            notifFrame.origin.x -= (notifFrame.size.width + TNGrowlPlacementMarginRight);
+            notifFrame.origin.y = TNGrowlPlacementMarginTop;    
+        }
     }
-    
-    notifFrame.origin.x = frame.size.width - _notificationFrame.size.width - TNGrowlPlacementMarginRight;
     
     [_notifications addObject:notifView];
     
+    [notifView setAutoresizingMask:CPViewMinXMargin];
     [notifView setFrame:notifFrame];
     
     [_view addSubview:notifView];
@@ -252,6 +275,10 @@ TNGrowlAnimationDuration    = 0.3;
     
     [_notifications removeObject:senderView];
     [senderView removeFromSuperview];
+    
+    if (_useWindowMouseMoveEvents && [[_view window] acceptsMouseMovedEvents] && [_notifications count] == 0);
+        [[_view window] setAcceptsMouseMovedEvents:NO];
+    
 }
 
 @end
