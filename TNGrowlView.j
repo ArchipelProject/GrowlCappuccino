@@ -32,6 +32,9 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
 */
 @implementation TNGrowlView : CPView
 {
+    id          _target             @accessors(getter=target,setter=setTarget:);
+    SEL         _action             @accessors(getter=action,setter=setAction:);
+    id          _actionParameters   @accessors(getter=actionParameters,setter=setActionParameters:);
     CPImageView _icon;
     CPTextField _title;
     CPTextField _message;
@@ -91,6 +94,9 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     {
         [_timer invalidate];
         [self willBeRemoved:nil];
+        
+        if (_target && _action)
+            [_target performSelector:_action withObject:self withObject:_actionParameters];
     }
 
     [super mouseDown:anEvent];

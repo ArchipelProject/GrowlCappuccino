@@ -194,6 +194,18 @@ TNGrowlAnimationDuration    = 0.3;
 */
 - (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage customIcon:(CPImage)anIcon
 {
+    [self pushNotificationWithTitle:aTitle message:aMessage customIcon:anIcon target:nil action:nil actionParameters:nil];
+}
+
+/*! display a notification with a CPImage as icon.
+    @param aTitle the title of the notification
+    @param aMessage the mesage of the notification
+    @param anIcon a CPImage representing the notification icon
+    @param aTarget the target of the click responder
+    @param anAction a selector of aTarget to perform on click
+*/
+- (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage customIcon:(CPImage)anIcon target:(id)aTarget action:(SEL)anAction actionParameters:(id)anObject
+{
     var center      = [CPNotificationCenter defaultCenter];
     var notifView   = [[TNGrowlView alloc] initWithFrame:_notificationFrame title:aTitle message:aMessage icon:anIcon lifeTime:_defaultLifeTime background:_backgroundColor];
     var frame       = [_view frame];
@@ -240,6 +252,9 @@ TNGrowlAnimationDuration    = 0.3;
     
     [notifView setAutoresizingMask:CPViewMinXMargin];
     [notifView setFrame:notifFrame];
+    [notifView setTarget:aTarget];
+    [notifView setAction:anAction];
+    [notifView setActionParameters:anObject];
     
     [_view addSubview:notifView];
     
