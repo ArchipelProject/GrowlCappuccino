@@ -71,7 +71,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
         [_message setLineBreakMode:CPLineBreakByWordWrapping];
         [_message setAutoresizingMask:CPViewHeightSizable | CPViewWidthSizable];
         [_message setTextColor:[CPColor whiteColor]];
-
+        
         [self addSubview:_icon];
         [self addSubview:_title];
         [self addSubview:_message];
@@ -79,6 +79,13 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
         [self setBackgroundColor:aBackground];
         [self setBorderRadius:5];
         [self setAlphaValue:0.8];
+        
+        var height = [aMessage sizeWithFont:[_message font] inWidth:CGRectGetWidth(aFrame) - 44].height;
+        
+        if (height > aFrame.size.height)
+            aFrame.size.height = height + 30;
+        
+        [self setFrame:aFrame];
 
         _timer = [CPTimer scheduledTimerWithTimeInterval:_lifeTime target:self selector:@selector(willBeRemoved:) userInfo:nil repeats:NO];
     }
@@ -138,6 +145,11 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     var center = [CPNotificationCenter defaultCenter];
 
     [center postNotificationName:TNGrowlViewLifeTimeExpirationNotification object:self];
+}
+
+- (void)setBorderRadius:(float)aRadius
+{
+    _DOMElement.style.borderRadius = aRadius + "px";
 }
 
 @end

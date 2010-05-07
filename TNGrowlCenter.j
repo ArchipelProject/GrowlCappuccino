@@ -126,7 +126,7 @@ TNGrowlAnimationDuration    = 0.3;
     if (self = [super init])
     {
         var bundle          = [CPBundle bundleForClass:[self class]];
-        var backgroundImage = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"background.png"]];
+        var backgroundImage = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"background.png"] size:CGSizeMake(TNGrowlPlacementWidth, TNGrowlPlacementHeight)];
         
         _notifications              = [CPArray array];
         _notificationFrame          = CGRectMake(10,10, TNGrowlPlacementWidth,TNGrowlPlacementHeight);
@@ -280,7 +280,7 @@ TNGrowlAnimationDuration    = 0.3;
     [anim startAnimation];
 }
 
-/*! delegate of CPAnimation. Will remove définitly the TNGrowlView
+/*! delegate of CPAnimation. Will remove definitly the TNGrowlView
     from the superview
     @param anAnimation the animation that have ended
 */
