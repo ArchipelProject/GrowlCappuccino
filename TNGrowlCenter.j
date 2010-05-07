@@ -127,6 +127,7 @@ TNGrowlAnimationDuration    = 0.3;
     {
         var bundle          = [CPBundle bundleForClass:[self class]];
         var backgroundImage = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"background.png"] size:CGSizeMake(TNGrowlPlacementWidth, TNGrowlPlacementHeight)];
+                
         
         _notifications              = [CPArray array];
         _notificationFrame          = CGRectMake(10,10, TNGrowlPlacementWidth,TNGrowlPlacementHeight);
@@ -225,11 +226,12 @@ TNGrowlAnimationDuration    = 0.3;
     {
         var isViewInThisFrame = NO;
         
+        var tmpFrame
         for (var j = 0; j < [_notifications count]; j++)
         {
-            var tmpFrame = [[_notifications objectAtIndex:j] frame];
+            tmpFrame = [[_notifications objectAtIndex:j] frame];
             
-            if (CPRectEqualToRect(notifFrame, tmpFrame))//((notifFrame.origin.y == tmpFrame.origin.y) && (notifFrame.origin.x == tmpFrame.origin.x))
+            if ((notifFrame.origin.y == tmpFrame.origin.y) && (notifFrame.origin.x == tmpFrame.origin.x))
             {
                 isViewInThisFrame = YES;
                 break;
@@ -239,7 +241,7 @@ TNGrowlAnimationDuration    = 0.3;
         if (!isViewInThisFrame)
             break;
         
-        notifFrame.origin.y += _notificationFrame.size.height + TNGrowlPlacementMarginTop;    
+        notifFrame.origin.y += tmpFrame.size.height + TNGrowlPlacementMarginTop;    
 
         if ((notifFrame.origin.y + notifFrame.size.height) >= frame.size.height)
         {

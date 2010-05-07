@@ -59,7 +59,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
         _icon       = [[CPImageView alloc] initWithFrame:CGRectMake(5, 6, 36, 36)];
         _title      = [[CPTextField alloc] initWithFrame:CGRectMake(44, 5, aFrame.size.width - 44, 20)];
         _message    = [[CPTextField alloc] initWithFrame:CGRectMake(44, 20, aFrame.size.width - 44, aFrame.size.height - 25)];
-
+        
         [_icon setImageScaling:CPScaleProportionally];
         [_icon setImage:anIcon];
         [_icon setBorderRadius:5];
@@ -77,16 +77,21 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
         [self addSubview:_message];
         
         [self setBackgroundColor:aBackground];
+        _DOMElement.style.backgroundRepeat = "no-repeat";
+        _DOMElement.style.backgroundColor = "black";
         [self setBorderRadius:5];
         [self setAlphaValue:0.8];
         
         var height = [aMessage sizeWithFont:[_message font] inWidth:CGRectGetWidth(aFrame) - 44].height;
         
-        if (height > aFrame.size.height)
-            aFrame.size.height = height + 30;
+        // if (height > aFrame.size.height)
+        aFrame.size.height = height + 30;
+        
+        if (aFrame.size.height < TNGrowlPlacementHeight)
+            aFrame.size.height = TNGrowlPlacementHeight
         
         [self setFrame:aFrame];
-
+        
         _timer = [CPTimer scheduledTimerWithTimeInterval:_lifeTime target:self selector:@selector(willBeRemoved:) userInfo:nil repeats:NO];
     }
 
