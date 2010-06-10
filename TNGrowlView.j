@@ -155,6 +155,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
 - (void)setBorderRadius:(float)aRadius
 {
     _DOMElement.style.borderRadius = aRadius + "px";
+    _DOMElement.style.MozBorderRadius = aRadius + "px";
 }
 
 @end
