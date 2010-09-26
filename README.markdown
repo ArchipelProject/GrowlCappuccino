@@ -20,6 +20,7 @@ Simply include the GrowlCappuccino framework in your Frameworks directory and in
 	[...]
 
 ## Documentation
+
 To generate the documentation execute the following :
 
 	# doxygen GrowlCappuccino.doxygen
