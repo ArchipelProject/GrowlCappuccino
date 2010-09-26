@@ -7,20 +7,23 @@ GrowlCappuccino is a framework that allows to mimic Growl notificatiom system in
 ## Quick Start</h3>
 
 Simply include the GrowlCappuccino framework in your Frameworks directory and include GrowlCappuccino.js
+```objj
+@import <GrowlCappuccino/GrowlCappuccino.j>
 
-	@import <GrowlCappuccino/GrowlCappuccino.j>
+[...]
 
-	[...]
+var growl = [TNGrowlCenter defaultCenter];
 
-	var growl = [TNGrowlCenter defaultCenter];
+[grow setView:aView];
+[growl pushNotificationWithTitle:@"Hello" message:@"Hello World!"];
 
-	[grow setView:aView];
-	[growl pushNotificationWithTitle:@"Hello" message:@"Hello World!"];
+[...]
+```
 
-	[...]
 
 ## Documentation
 
 To generate the documentation execute the following :
-
-	# doxygen GrowlCappuccino.doxygen
+``` bash
+# doxygen GrowlCappuccino.doxygen
+```
