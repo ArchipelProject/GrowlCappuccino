@@ -21,23 +21,25 @@
 var ENV = require("system").env,
     FILE = require("file"),
 	OS = require("os"),
-    task = require("jake").task,
-    FileList = require("jake").FileList,
-    app = require("cappuccino/jake").app,
+	JAKE = require("jake"),
+    task = JAKE.task,
+    CLEAN = require("jake/clean").CLEAN,
+    FileList = JAKE.FileList,
+    framework = require("cappuccino/jake").framework,
     configuration = ENV["CONFIG"] || ENV["CONFIGURATION"] || ENV["c"] || "Release";
 
-app ("GrowlCappuccino", function(task)
+framework ("GrowlCappuccino", function(task)
 {
     task.setBuildIntermediatesPath(FILE.join("Build", "GrowlCappuccino.build", configuration));
     task.setBuildPath(FILE.join("Build", configuration));
 
     task.setProductName("GrowlCappuccino");
-    task.setIdentifier("org.archipel.GrowlCappuccino");
+    task.setIdentifier("org.archipel.growlcappuccino");
     task.setVersion("1.0");
     task.setAuthor("Antoine Mercadal");
     task.setEmail("antoine.mercadal @nospam@ inframonde.eu");
     task.setSummary("GrowlCappuccino");
-    task.setSources(new FileList("*.j"));
+    task.setSources(new FileList("*.j", "GrowlCappuccino/*.j"));
     task.setResources(new FileList("Resources/*"));
     task.setInfoPlistPath("Info.plist");
 
@@ -47,12 +49,36 @@ app ("GrowlCappuccino", function(task)
         task.setCompilerFlags("-O");
 });
 
+task("build", ["GrowlCappuccino"]);
 
-task ("documentation", function(task)
+task("debug", function()
+{
+    ENV["CONFIG"] = "Debug"
+    JAKE.subjake(["."], "build", ENV);
+});
+
+task("release", function()
+{
+    ENV["CONFIG"] = "Release"
+    JAKE.subjake(["."], "build", ENV);
+});
+
+task ("documentation", function()
 {
    OS.system("doxygen GrowlCappuccino.doxygen")
 });
 
-task ("default", ["GrowlCappuccino"]);
-task ("docs", ["documentation"]);
-task ("all", ["GrowlCappuccino", "documentation"]);
+task("test", function()
+{
+    var tests = new FileList('Test/*Test.j');
+    var cmd = ["ojtest"].concat(tests.items());
+    var cmdString = cmd.map(OS.enquote).join(" ");
+
+    var code = OS.system(cmdString);
+    if (code !== 0)
+        OS.exit(code);
+});
+
+task ("default", ["release"]);
+task ("docs", ["release", "documentation"]);
+task ("all", ["release", "debug", "documentation"]);
