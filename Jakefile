@@ -34,7 +34,7 @@ framework ("GrowlCappuccino", function(task)
     task.setBuildPath(FILE.join("Build", configuration));
 
     task.setProductName("GrowlCappuccino");
-    task.setIdentifier("org.archipel.growlcappuccino");
+    task.setIdentifier("org.archipelproject.growlcappuccino");
     task.setVersion("1.0");
     task.setAuthor("Antoine Mercadal");
     task.setEmail("antoine.mercadal @nospam@ inframonde.eu");
