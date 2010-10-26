@@ -1,19 +1,21 @@
-/*  
+/*
  * TNGrowlView.j
- *    
- * Copyright (C) 2010 Antoine Mercadal <antoine.mercadal@inframonde.eu>
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
+ *
+ * Copyright (C) 2010  Antoine Mercadal <antoine.mercadal@inframonde.eu>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 @import <Foundation/Foundation.j>
@@ -59,7 +61,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
         _icon       = [[CPImageView alloc] initWithFrame:CGRectMake(5, 6, 36, 36)];
         _title      = [[CPTextField alloc] initWithFrame:CGRectMake(44, 5, aFrame.size.width - 44, 20)];
         _message    = [[CPTextField alloc] initWithFrame:CGRectMake(44, 20, aFrame.size.width - 44, aFrame.size.height - 25)];
-        
+
         [_icon setImageScaling:CPScaleProportionally];
         [_icon setImage:anIcon];
         [_icon setBorderRadius:5];
@@ -71,27 +73,27 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
         [_message setLineBreakMode:CPLineBreakByWordWrapping];
         [_message setAutoresizingMask:CPViewHeightSizable | CPViewWidthSizable];
         [_message setTextColor:[CPColor whiteColor]];
-        
+
         [self addSubview:_icon];
         [self addSubview:_title];
         [self addSubview:_message];
-        
+
         [self setBackgroundColor:aBackground];
         _DOMElement.style.backgroundRepeat = "no-repeat";
         _DOMElement.style.backgroundColor = "black";
         [self setBorderRadius:5];
         [self setAlphaValue:0.8];
-        
+
         var height = [aMessage sizeWithFont:[_message font] inWidth:CGRectGetWidth(aFrame) - 44].height;
-        
+
         // if (height > aFrame.size.height)
         aFrame.size.height = height + 30;
-        
+
         if (aFrame.size.height < TNGrowlPlacementHeight)
             aFrame.size.height = TNGrowlPlacementHeight
-        
+
         [self setFrame:aFrame];
-        
+
         _timer = [CPTimer scheduledTimerWithTimeInterval:_lifeTime target:self selector:@selector(willBeRemoved:) userInfo:nil repeats:NO];
     }
 
@@ -106,7 +108,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     {
         [_timer invalidate];
         [self willBeRemoved:nil];
-        
+
         if (_target && _action)
             [_target performSelector:_action withObject:self withObject:_actionParameters];
     }
@@ -125,7 +127,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
         [_timer invalidate];
         [self setAlphaValue:1.0];
     }
-    
+
     [super mouseEntered:anEvent];
 }
 
@@ -138,7 +140,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     {
         _timer = [CPTimer scheduledTimerWithTimeInterval:_lifeTime target:self selector:@selector(willBeRemoved:) userInfo:nil repeats:NO];
     }
-    
+
     [super mouseExited:anEvent];
 }
 
