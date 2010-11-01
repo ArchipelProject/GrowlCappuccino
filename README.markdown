@@ -19,6 +19,11 @@ Simply include the GrowlCappuccino framework in your Frameworks directory and in
 
 	[...]
 
+## Demo application
+
+You can see a demo application here: [Demo](http://github.com/primalmotion/GrowlCappuccino-Example/)
+
+
 ## Documentation
 
 To generate the documentation execute the following :
