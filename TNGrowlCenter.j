@@ -48,12 +48,6 @@ TNGrowlIconError    = @"TNGrowlIconError";
 TNGrowlIconWarning  = @"TNGrowlIconWarning";
 
 /*! @global
-    @group TNGrowlIcon
-    icon identitier for custom icon
-*/
-TNGrowlIconCustom   = @"TNGrowlIconCustom";
-
-/*! @global
     @group TNGrowlPlacement
     the height of TNGrowlView
 */
@@ -98,14 +92,9 @@ TNGrowlAnimationDuration    = 0.3;
 @implementation TNGrowlCenter : CPObject
 {
     float       _defaultLifeTime    @accessors(getter=lifeDefaultTime, setter=setDefaultLifeTime:);
-    CPColor     _backgroundColor    @accessors(getter=backgroundColor, setter=setBackgroundColor:);
     CPView      _view               @accessors(getter=view, setter=setView:);
-    CPImage     _iconCustom         @accessors(getter=customIcon, setter=setCustomIcon:);
     CPArray     _notifications;
     CPRect      _notificationFrame;
-    CPImage     _iconInfo;
-    CPImage     _iconWarning;
-    CPImage     _iconError;
     Boolean     _useWindowMouseMoveEvents;
 }
 
@@ -127,17 +116,11 @@ TNGrowlAnimationDuration    = 0.3;
 {
     if (self = [super init])
     {
-        var bundle          = [CPBundle bundleForClass:[self class]],
-            backgroundImage = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"background.png"] size:CGSizeMake(TNGrowlPlacementWidth, TNGrowlPlacementHeight)];
+        var bundle          = [CPBundle bundleForClass:[self class]];
 
-
+        _defaultLifeTime            = [bundle objectForInfoDictionaryKey:@"TNGrowlDefaultLifeTime"];
         _notifications              = [CPArray array];
         _notificationFrame          = CGRectMake(10,10, TNGrowlPlacementWidth,TNGrowlPlacementHeight);
-        _defaultLifeTime            = [bundle objectForInfoDictionaryKey:@"TNGrowlDefaultLifeTime"];
-        _iconInfo                   = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-info.png"]];
-        _iconError                  = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-error.png"]];
-        _iconWarning                = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-warning.png"]];
-        _backgroundColor            = [CPColor colorWithPatternImage:backgroundImage];
         _useWindowMouseMoveEvents   = [bundle objectForInfoDictionaryKey:@"TNGrowlUseMouseMoveEvents"];
     }
 
@@ -166,28 +149,7 @@ TNGrowlAnimationDuration    = 0.3;
 */
 - (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage icon:(CPString)anIconType
 {
-    var icon;
-
-    switch (anIconType)
-    {
-        case TNGrowlIconInfo:
-            icon = _iconInfo;
-            break;
-
-        case TNGrowlIconWarning:
-            icon = _iconWarning;
-            break;
-
-        case TNGrowlIconError:
-            icon = _iconError;
-            break;
-
-        case TNGrowlIconCustom:
-            icon = _iconCustom;
-            break;
-    }
-
-    [self pushNotificationWithTitle:aTitle message:aMessage customIcon:icon];
+    [self pushNotificationWithTitle:aTitle message:aMessage customIcon:anIconType];
 }
 
 /*! display a notification with a CPImage as icon.
@@ -195,7 +157,7 @@ TNGrowlAnimationDuration    = 0.3;
     @param aMessage the mesage of the notification
     @param anIcon a CPImage representing the notification icon
 */
-- (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage customIcon:(CPImage)anIcon
+- (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage customIcon:(id)anIcon
 {
     [self pushNotificationWithTitle:aTitle message:aMessage customIcon:anIcon target:nil action:nil actionParameters:nil];
 }
@@ -207,10 +169,10 @@ TNGrowlAnimationDuration    = 0.3;
     @param aTarget the target of the click responder
     @param anAction a selector of aTarget to perform on click
 */
-- (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage customIcon:(CPImage)anIcon target:(id)aTarget action:(SEL)anAction actionParameters:(id)anObject
+- (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage customIcon:(id)anIcon target:(id)aTarget action:(SEL)anAction actionParameters:(id)anObject
 {
     var center      = [CPNotificationCenter defaultCenter],
-        notifView   = [[TNGrowlView alloc] initWithFrame:_notificationFrame title:aTitle message:aMessage icon:anIcon lifeTime:_defaultLifeTime background:_backgroundColor],
+        notifView   = [[TNGrowlView alloc] initWithFrame:_notificationFrame title:aTitle message:aMessage icon:anIcon lifeTime:_defaultLifeTime],
         frame       = [_view frame],
         notifFrame  = CPRectCreateCopy(_notificationFrame),
         animParams  = [CPDictionary dictionaryWithObjectsAndKeys:notifView, CPViewAnimationTargetKey, CPViewAnimationFadeInEffect, CPViewAnimationEffectKey],

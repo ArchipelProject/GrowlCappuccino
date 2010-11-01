@@ -34,15 +34,20 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
 */
 @implementation TNGrowlView : CPView
 {
-    id          _target             @accessors(getter=target,setter=setTarget:);
-    SEL         _action             @accessors(getter=action,setter=setAction:);
-    id          _actionParameters   @accessors(getter=actionParameters,setter=setActionParameters:);
-    CPImageView _icon;
-    CPTextField _title;
-    CPTextField _message;
-    CPTimer     _timer;
-    float       _lifeTime;
+    id              _target             @accessors(getter=target,setter=setTarget:);
+    SEL             _action             @accessors(getter=action,setter=setAction:);
+    id              _actionParameters   @accessors(getter=actionParameters,setter=setActionParameters:);
+
+    CPImageView     _icon;
+    CPTextField     _title;
+    CPTextField     _message;
+    CPTimer         _timer;
+    float           _lifeTime;
 }
+
+
+#pragma mark -
+#pragma mark Initialization
 
 /*! intialize the TNGrowlView
     @param aFrame the frame of the view
@@ -53,40 +58,57 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     @param aBackground the background of TNGrowlView
     @return initialized instance of TNGrowlView
 */
-- (id)initWithFrame:(CPRect)aFrame title:(CPString)aTitle message:(CPString)aMessage icon:(CPImage)anIcon lifeTime:(float)aLifeTime background:(CPColor)aBackground
+- (id)initWithFrame:(CPRect)aFrame title:(CPString)aTitle message:(CPString)aMessage icon:(id)anIcon lifeTime:(float)aLifeTime
 {
     if (self = [super initWithFrame:aFrame])
     {
-        _lifeTime   = aLifeTime;
-        _icon       = [[CPImageView alloc] initWithFrame:CGRectMake(5, 6, 36, 36)];
-        _title      = [[CPTextField alloc] initWithFrame:CGRectMake(44, 5, aFrame.size.width - 44, 20)];
-        _message    = [[CPTextField alloc] initWithFrame:CGRectMake(44, 20, aFrame.size.width - 44, aFrame.size.height - 25)];
-
-        [_icon setImageScaling:CPScaleProportionally];
-        [_icon setImage:anIcon];
-        [_icon setBorderRadius:5];
+        // title
+        _title  = [[CPTextField alloc] initWithFrame:CGRectMake(44, 5, aFrame.size.width - 44, 20)];
         [_title setStringValue:aTitle];
         [_title setFont:[CPFont boldSystemFontOfSize:12]];
         [_title setTextColor:[CPColor whiteColor]];
         [_title setAutoresizingMask:CPViewWidthSizable];
+        [self addSubview:_title];
+
+        // message
+        _message = [[CPTextField alloc] initWithFrame:CGRectMake(44, 20, aFrame.size.width - 50, aFrame.size.height - 25)];
         [_message setStringValue:aMessage];
         [_message setLineBreakMode:CPLineBreakByWordWrapping];
         [_message setAutoresizingMask:CPViewHeightSizable | CPViewWidthSizable];
-        [_message setTextColor:[CPColor whiteColor]];
-
-        [self addSubview:_icon];
-        [self addSubview:_title];
+        [_message setTextColor:[self valueForThemeAttribute:@"text-color"]];
         [self addSubview:_message];
 
-        [self setBackgroundColor:aBackground];
-        _DOMElement.style.backgroundRepeat = "no-repeat";
-        _DOMElement.style.backgroundColor = "black";
-        [self setBorderRadius:5];
-        [self setAlphaValue:0.8];
+        // background
+        [self setBackgroundColor:[self valueForThemeAttribute:@"background-color"]];
+        [self setAlphaValue:[self valueForThemeAttribute:@"alpha-value"]];
 
+        // icon
+        _icon       = [[CPImageView alloc] initWithFrame:CGRectMake(5, 6, 36, 36)];
+        [_icon setImageScaling:CPScaleProportionally];
+
+        if ([anIcon class] == CPImage)
+            [_icon setImage:anIcon];
+        else
+            switch (anIcon)
+            {
+                case TNGrowlIconInfo:
+                    [_icon setImage:[self valueForThemeAttribute:@"icon-info"]];
+                    break;
+
+                case TNGrowlIconWarning:
+                    [_icon setImage:[self valueForThemeAttribute:@"icon-warning"]];
+                    break;
+
+                case TNGrowlIconError:
+                    [_icon setImage:[self valueForThemeAttribute:@"icon-error"]];
+                    break;
+            }
+        [self addSubview:_icon];
+
+
+        // frame height
         var height = [aMessage sizeWithFont:[_message font] inWidth:CGRectGetWidth(aFrame) - 44].height;
 
-        // if (height > aFrame.size.height)
         aFrame.size.height = height + 30;
 
         if (aFrame.size.height < TNGrowlPlacementHeight)
@@ -94,11 +116,17 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
 
         [self setFrame:aFrame];
 
+        //timer
+        _lifeTime = aLifeTime;
         _timer = [CPTimer scheduledTimerWithTimeInterval:_lifeTime target:self selector:@selector(willBeRemoved:) userInfo:nil repeats:NO];
     }
 
     return self;
 }
+
+
+#pragma mark -
+#pragma mark Events
 
 /*! if mouse clicked, set life time to 0
 */
@@ -144,6 +172,9 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     [super mouseExited:anEvent];
 }
 
+
+#pragma mark -
+#pragma mark Timer handlers
 /*! can be triggered by timer or by mouseDown: message
     post the notification that the life time has expired.
 */
@@ -154,10 +185,37 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     [center postNotificationName:TNGrowlViewLifeTimeExpirationNotification object:self];
 }
 
-- (void)setBorderRadius:(float)aRadius
+
+#pragma mark -
+#pragma mark Theming
+
++ (CPString)themeClass
 {
-    _DOMElement.style.borderRadius = aRadius + "px";
-    _DOMElement.style.MozBorderRadius = aRadius + "px";
+    return @"growl-view";
+}
+
++ (id)themeAttributes
+{
+    var bundle = [CPBundle bundleForClass:[self class]],
+        backgroundImage = [CPColor colorWithPatternImage:[[CPNinePartImage alloc] initWithImageSlices:[
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/top-left.png"] size:CPSizeMake(10.0, 30.0)],
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/top.png"] size:CPSizeMake(1.0, 30.0)],
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/top-right.png"] size:CPSizeMake(10.0, 30.0)],
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/left.png"] size:CPSizeMake(10.0, 1.0)],
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/center.png"] size:CPSizeMake(1.0, 1.0)],
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/right.png"] size:CPSizeMake(10.0, 1.0)],
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/bottom-left.png"] size:CPSizeMake(10.0, 12.0)],
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/bottom.png"] size:CPSizeMake(1.0, 12.0)],
+            [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"Noir/bottom-right.png"] size:CPSizeMake(10.0, 12.0)],
+        ]]],
+        iconInfo    = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-info.png"]],
+        iconError   = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-error.png"]],
+        iconWarning = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-warning.png"]];
+
+
+
+    return [CPDictionary dictionaryWithObjects:[backgroundImage, iconInfo, iconError, iconWarning, [CPColor whiteColor], 0.8]
+                                       forKeys:[@"background-color", @"icon-info", @"icon-error", @"icon-warning", @"text-color", @"alpha-value"]];
 }
 
 @end
