@@ -98,6 +98,10 @@ TNGrowlAnimationDuration    = 0.3;
     Boolean     _useWindowMouseMoveEvents;
 }
 
+
+#pragma mark -
+#pragma mark Initialization
+
 /*! return the defaultCenter
     @return TNGrowlCenter the default center;
 */
@@ -127,6 +131,32 @@ TNGrowlAnimationDuration    = 0.3;
     return self;
 }
 
+
+#pragma mark -
+#pragma mark Notification handlers
+
+/*! Responder of the message TNGrowlViewLifeTimeExpirationNotification
+    this will start fade out the TNGrowlView that sent the notification
+    @param aNotification the notification
+*/
+- (void)didReceivedNotificationEndLifeTime:(CPNotification)aNotification
+{
+    var center      = [CPNotificationCenter defaultCenter],
+        senderView  = [aNotification object],
+        animView    = [CPDictionary dictionaryWithObjectsAndKeys:senderView, CPViewAnimationTargetKey, CPViewAnimationFadeOutEffect, CPViewAnimationEffectKey],
+        anim        = [[CPViewAnimation alloc] initWithViewAnimations:[animView]];
+
+    [center removeObserver:self name:TNGrowlViewLifeTimeExpirationNotification object:senderView];
+
+    [anim setDuration:TNGrowlAnimationDuration];
+    [anim setDelegate:self];
+    [anim startAnimation];
+}
+
+
+#pragma mark -
+#pragma mark Messaging
+
 /*! display a notification with type TNGrowlIconInfo
     @param aTitle the title of the notification
     @param aMessage the mesage of the notification
@@ -141,7 +171,6 @@ TNGrowlAnimationDuration    = 0.3;
      - TNGrowlIconInfo
      - TNGrowlIconError
      - TNGrowlIconWarning
-     - TNGrowlIconCustom
 
     @param aTitle the title of the notification
     @param aMessage the mesage of the notification
@@ -228,23 +257,9 @@ TNGrowlAnimationDuration    = 0.3;
     [anim startAnimation];
 }
 
-/*! Responder of the message TNGrowlViewLifeTimeExpirationNotification
-    this will start fade out the TNGrowlView that sent the notification
-    @param aNotification the notification
-*/
-- (void)didReceivedNotificationEndLifeTime:(CPNotification)aNotification
-{
-    var center      = [CPNotificationCenter defaultCenter],
-        senderView  = [aNotification object],
-        animView    = [CPDictionary dictionaryWithObjectsAndKeys:senderView, CPViewAnimationTargetKey, CPViewAnimationFadeOutEffect, CPViewAnimationEffectKey],
-        anim        = [[CPViewAnimation alloc] initWithViewAnimations:[animView]];
 
-    [center removeObserver:self name:TNGrowlViewLifeTimeExpirationNotification object:senderView];
-
-    [anim setDuration:TNGrowlAnimationDuration];
-    [anim setDelegate:self];
-    [anim startAnimation];
-}
+#pragma mark -
+#pragma mark Delegates
 
 /*! delegate of CPAnimation. Will remove definitly the TNGrowlView
     from the superview
