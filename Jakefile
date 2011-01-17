@@ -81,5 +81,5 @@ task("test", function()
 });
 
 task ("default", ["release"]);
-task ("docs", ["release", "documentation"]);
+task ("docs", ["documentation"]);
 task ("all", ["release", "debug", "documentation"]);
