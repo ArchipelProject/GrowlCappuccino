@@ -86,7 +86,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
         _icon       = [[CPImageView alloc] initWithFrame:CGRectMake(5, 6, 36, 36)];
         [_icon setImageScaling:CPScaleProportionally];
 
-        if ([anIcon class] == CPImage)
+        if ([anIcon isKindOfClass:CPImage])
             [_icon setImage:anIcon];
         else
             switch (anIcon)
