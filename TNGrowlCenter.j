@@ -19,7 +19,9 @@
  */
 
 @import <Foundation/Foundation.j>
-@import <AppKit/AppKit.j>
+
+@import <AppKit/CPView.j>
+@import <AppKit/CPViewAnimation.j>
 
 @import "TNGrowlView.j";
 
@@ -91,11 +93,11 @@ TNGrowlAnimationDuration    = 0.3;
 */
 @implementation TNGrowlCenter : CPObject
 {
-    float       _defaultLifeTime    @accessors(getter=lifeDefaultTime, setter=setDefaultLifeTime:);
-    CPView      _view               @accessors(getter=view, setter=setView:);
+    BOOL        _useWindowMouseMoveEvents;
     CPArray     _notifications;
     CPRect      _notificationFrame;
-    Boolean     _useWindowMouseMoveEvents;
+    CPView      _view               @accessors(getter=view, setter=setView:);
+    float       _defaultLifeTime    @accessors(getter=lifeDefaultTime, setter=setDefaultLifeTime:);
 }
 
 

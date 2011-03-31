@@ -19,7 +19,13 @@
  */
 
 @import <Foundation/Foundation.j>
-@import <AppKit/AppKit.j>
+
+@import <AppKit/CPImage.j>
+@import <AppKit/CPImageView.j>
+@import <AppKit/CPTextField.j>
+@import <AppKit/CPView.j>
+
+
 
 /*! @global
     @group TNGrowlNotification
@@ -34,13 +40,13 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
 */
 @implementation TNGrowlView : CPView
 {
+    id              _actionParameters   @accessors(getter=actionParameters,setter=setActionParameters:);
     id              _target             @accessors(getter=target,setter=setTarget:);
     SEL             _action             @accessors(getter=action,setter=setAction:);
-    id              _actionParameters   @accessors(getter=actionParameters,setter=setActionParameters:);
 
     CPImageView     _icon;
-    CPTextField     _title;
     CPTextField     _message;
+    CPTextField     _title;
     CPTimer         _timer;
     float           _lifeTime;
 }
