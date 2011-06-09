@@ -81,6 +81,11 @@ TNGrowlAnimationDuration    = 0.3;
 
 
 
+var _TNGrowlIconInfo,
+    _TNGrowlIconError,
+    _TNGrowlIconWarning;
+
+
 /*! @ingroup growlcappuccino
     this is the GrowlCappuccino notification center. This is from where you can post Growl notification.
     it provide a class method defaultCenter: that return the default GrowlCappuccino center.
@@ -133,6 +138,10 @@ TNGrowlAnimationDuration    = 0.3;
         _useWindowMouseMoveEvents   = [bundle objectForInfoDictionaryKey:@"TNGrowlUseMouseMoveEvents"];
         _notificationsHistory       = [CPArray array];
         _maxHistory                 = 50;
+
+        _TNGrowlIconInfo    = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-info.png"]];
+        _TNGrowlIconError   = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-error.png"]];
+        _TNGrowlIconWarning = [[CPImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-warning.png"]];
     }
 
     return self;
@@ -263,7 +272,23 @@ TNGrowlAnimationDuration    = 0.3;
     [anim setDuration:0.3];
     [anim startAnimation];
 
-    [_notificationsHistory addObject:[CPDictionary dictionaryWithObjectsAndKeys:aTitle , "title", aMessage, "message", anIcon, "icon", [CPDate date], "date"]];
+    var imageIcon;
+    switch (anIcon)
+    {
+        case TNGrowlIconWarning:
+            imageIcon = _TNGrowlIconWarning;
+            break;
+        case TNGrowlIconError:
+            imageIcon = _TNGrowlIconError;
+            break;
+        default:
+            imageIcon = _TNGrowlIconInfo;
+            break;
+    }
+    [_notificationsHistory addObject:[CPDictionary dictionaryWithObjectsAndKeys:aTitle , "title",
+                                                                                aMessage, "message",
+                                                                                imageIcon, "icon",
+                                                                                [CPDate date], "date"]];
     if ([_notificationsHistory count] > _maxHistory)
         [_notificationsHistory removeObjectAtIndex:0];
 }
