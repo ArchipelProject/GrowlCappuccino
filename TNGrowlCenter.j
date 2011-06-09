@@ -93,11 +93,14 @@ TNGrowlAnimationDuration    = 0.3;
 */
 @implementation TNGrowlCenter : CPObject
 {
+    CPArray     _notificationsHistory   @accessors(property=notificationsHistory);
+    int         _maxHistory             @accessors(property=maxHistory);
+    CPView      _view                   @accessors(property=view);
+    float       _defaultLifeTime        @accessors(property=lifeDefaultTime);
+
     BOOL        _useWindowMouseMoveEvents;
     CPArray     _notifications;
     CPRect      _notificationFrame;
-    CPView      _view               @accessors(getter=view, setter=setView:);
-    float       _defaultLifeTime    @accessors(getter=lifeDefaultTime, setter=setDefaultLifeTime:);
 }
 
 
@@ -128,6 +131,8 @@ TNGrowlAnimationDuration    = 0.3;
         _notifications              = [CPArray array];
         _notificationFrame          = CGRectMake(10,10, TNGrowlPlacementWidth,TNGrowlPlacementHeight);
         _useWindowMouseMoveEvents   = [bundle objectForInfoDictionaryKey:@"TNGrowlUseMouseMoveEvents"];
+        _notificationsHistory       = [CPArray array];
+        _maxHistory                 = 50;
     }
 
     return self;
@@ -257,6 +262,21 @@ TNGrowlAnimationDuration    = 0.3;
 
     [anim setDuration:0.3];
     [anim startAnimation];
+
+    [_notificationsHistory addObject:[CPDictionary dictionaryWithObjectsAndKeys:aTitle , "title", aMessage, "message", anIcon, "icon", [CPDate date], "date"]];
+    if ([_notificationsHistory count] > _maxHistory)
+        [_notificationsHistory removeObjectAtIndex:0];
+}
+
+
+#pragma mark -
+#pragma mark History
+
+/*! flush the history array
+*/
+- (void)clearHistory
+{
+    [_notificationsHistory removeAllObjects];
 }
 
 
@@ -276,7 +296,6 @@ TNGrowlAnimationDuration    = 0.3;
 
     if (_useWindowMouseMoveEvents && [[_view window] acceptsMouseMovedEvents] && [_notifications count] == 0);
         [[_view window] setAcceptsMouseMovedEvents:NO];
-
 }
 
 @end
