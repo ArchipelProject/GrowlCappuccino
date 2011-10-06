@@ -10,8 +10,6 @@
 	<string>GrowlCappuccino</string>
 	<key>CPBundlePackageType</key>
 	<string>FMWK</string>
-	<key>TNGrowlUseMouseMoveEvents</key>
-	<integer>0</integer>
 	<key>TNGrowlDefaultLifeTime</key>
 	<integer>5</integer>
 </dict>

@@ -92,8 +92,6 @@ var _TNGrowlIconInfo,
     In the most of the case you should use this default center.
 
     You can find two option to set in Info.plist
-     - TNGrowlUseMouseMoveEvents : 1 or 0. Default: 0. If 1, GrowlCappuccino will set acceptsMouseMovedEvents: to the _view's window. this
-     will allow to stop life time counting on mouse over, but it can affect the whole application performance
      - TNGrowlDefaultLifeTime : in seconds. Deafult: 5. The lifeTime of notification.
 */
 @implementation TNGrowlCenter : CPObject
@@ -103,7 +101,6 @@ var _TNGrowlIconInfo,
     CPView      _view                   @accessors(property=view);
     float       _defaultLifeTime        @accessors(property=lifeDefaultTime);
 
-    BOOL        _useWindowMouseMoveEvents;
     CPArray     _notifications;
     CPRect      _notificationFrame;
 }
@@ -135,7 +132,6 @@ var _TNGrowlIconInfo,
         _defaultLifeTime            = [bundle objectForInfoDictionaryKey:@"TNGrowlDefaultLifeTime"];
         _notifications              = [CPArray array];
         _notificationFrame          = CGRectMake(10,10, TNGrowlPlacementWidth,TNGrowlPlacementHeight);
-        _useWindowMouseMoveEvents   = [bundle objectForInfoDictionaryKey:@"TNGrowlUseMouseMoveEvents"];
         _notificationsHistory       = [CPArray array];
         _maxHistory                 = 50;
 
@@ -222,9 +218,6 @@ var _TNGrowlIconInfo,
         notifFrame  = CPRectCreateCopy(_notificationFrame),
         animParams  = [CPDictionary dictionaryWithObjectsAndKeys:notifView, CPViewAnimationTargetKey, CPViewAnimationFadeInEffect, CPViewAnimationEffectKey],
         anim        = [[CPViewAnimation alloc] initWithViewAnimations:[animParams]];
-
-    if (_useWindowMouseMoveEvents && ![[_view window] acceptsMouseMovedEvents])
-        [[_view window] setAcceptsMouseMovedEvents:YES];
 
     [center addObserver:self selector:@selector(didReceivedNotificationEndLifeTime:) name:TNGrowlViewLifeTimeExpirationNotification object:notifView];
 
@@ -318,9 +311,6 @@ var _TNGrowlIconInfo,
 
     [_notifications removeObject:senderView];
     [senderView removeFromSuperview];
-
-    if (_useWindowMouseMoveEvents && [[_view window] acceptsMouseMovedEvents] && [_notifications count] == 0);
-        [[_view window] setAcceptsMouseMovedEvents:NO];
 }
 
 @end
