@@ -23,7 +23,8 @@
 @import <AppKit/CPView.j>
 @import <AppKit/CPViewAnimation.j>
 
-@import "TNGrowlView.j";
+@import "TNGrowlMessage.j"
+@import "TNGrowlView.j"
 
 /*! @global
     @group TNGrowl
@@ -96,10 +97,11 @@ var _TNGrowlIconInfo,
 */
 @implementation TNGrowlCenter : CPObject
 {
-    CPArray     _notificationsHistory   @accessors(property=notificationsHistory);
-    int         _maxHistory             @accessors(property=maxHistory);
-    CPView      _view                   @accessors(property=view);
-    float       _defaultLifeTime        @accessors(property=lifeDefaultTime);
+    CPArray     _notificationsHistory               @accessors(property=notificationsHistory);
+    CPTableView _tableForNotificationHistory        @accessors(getter=tableForNotificationHistory);
+    CPView      _view                               @accessors(property=view);
+    float       _defaultLifeTime                    @accessors(property=lifeDefaultTime);
+    int         _maxHistory                         @accessors(property=maxHistory);
 
     CPArray     _notifications;
     CPRect      _notificationFrame;
@@ -107,7 +109,7 @@ var _TNGrowlIconInfo,
 
 
 #pragma mark -
-#pragma mark Initialization
+#pragma mark Class methods
 
 /*! return the defaultCenter
     @return TNGrowlCenter the default center;
@@ -119,6 +121,37 @@ var _TNGrowlIconInfo,
 
     return TNGrowlDefaultCenter;
 }
+
+/*! display a notification with type TNGrowlIconInfo
+    @param aTitle the title of the notification
+    @param aMessage the mesage of the notification
+*/
++ (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage
+{
+    [[TNGrowlCenter defaultCenter] pushNotificationWithTitle:aTitle message:aMessage];
+}
+
+/*! display a notification with type TNGrowlIconError
+    @param aTitle the title of the notification
+    @param aMessage the mesage of the notification
+*/
++ (void)pushErrorNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage
+{
+    [[TNGrowlCenter defaultCenter] pushNotificationWithTitle:aTitle message:aMessage icon:TNGrowlIconError];
+}
+
+/*! display a notification with type TNGrowlIconWarning
+    @param aTitle the title of the notification
+    @param aMessage the mesage of the notification
+*/
++ (void)pushWarningNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage
+{
+    [[TNGrowlCenter defaultCenter] pushNotificationWithTitle:aTitle message:aMessage icon:TNGrowlIconWarning];
+}
+
+
+#pragma mark -
+#pragma mark Initialization
 
 /*! initialize the class
     @return the initialized instance of TNGrowlCenter
@@ -169,13 +202,15 @@ var _TNGrowlIconInfo,
 #pragma mark -
 #pragma mark Messaging
 
-/*! display a notification with type TNGrowlIconInfo
+/*! @deprecated
+    display a notification with type TNGrowlIconInfo
     @param aTitle the title of the notification
     @param aMessage the mesage of the notification
 */
 - (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage
 {
     [self pushNotificationWithTitle:aTitle message:aMessage icon:TNGrowlIconInfo];
+    CPLog.warn("DEPRECATED: please use pushNotificationWithTitle:message: as a class method");
 }
 
 /*! display a notification with given type
@@ -278,23 +313,55 @@ var _TNGrowlIconInfo,
             imageIcon = _TNGrowlIconInfo;
             break;
     }
-    [_notificationsHistory addObject:[CPDictionary dictionaryWithObjectsAndKeys:aTitle , "title",
-                                                                                aMessage, "message",
-                                                                                imageIcon, "icon",
-                                                                                [CPDate date], "date"]];
+    [_notificationsHistory addObject:[TNGrowlMessage growlMessageWithTitle:aTitle message:aMessage icon:imageIcon]];
+
     if ([_notificationsHistory count] > _maxHistory)
         [_notificationsHistory removeObjectAtIndex:0];
+
+    if (_tableForNotificationHistory)
+        [_tableForNotificationHistory reloadData];
 }
 
 
 #pragma mark -
 #pragma mark History
 
+/*! set the table view that will show the history
+    NOTE: This should only work with tables using
+    as data source TNTableViewDataSource from TNKit.
+    If you are not using this dataSource object, do
+    not use it.
+
+    The table view should have as identifiers:
+    - "title" (CPString)
+    - "message" (CPString)
+    - "icon" (CPImage)
+    - "date" (CPDate)
+
+    @param aTableView the tableView
+*/
+- (void)setTableForNotificationHistory:(CPTableView)aTableView
+{
+    if (_tableForNotificationHistory === aTableView)
+        return;
+
+    if (![[_tableForNotificationHistory dataSource] className] === @"TNTableViewDataSource")
+        CPLog.warn("GrowlCappuccino: You should usie a table view as notification history that uses TNTableViewDataSource.");
+
+    _tableForNotificationHistory = aTableView;
+    [[_tableForNotificationHistory dataSource] setContent:[_notificationsHistory copy]];
+    _notificationsHistory = [_tableForNotificationHistory dataSource];
+    [_tableForNotificationHistory reloadData];
+}
+
 /*! flush the history array
 */
 - (void)clearHistory
 {
     [_notificationsHistory removeAllObjects];
+
+    if (_tableForNotificationHistory)
+        [_tableForNotificationHistory reloadData];
 }
 
 
