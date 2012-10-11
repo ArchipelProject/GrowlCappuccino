@@ -210,7 +210,6 @@ var _TNGrowlIconInfo,
 - (void)pushNotificationWithTitle:(CPString)aTitle message:(CPString)aMessage
 {
     [self pushNotificationWithTitle:aTitle message:aMessage icon:TNGrowlIconInfo];
-    CPLog.warn("DEPRECATED: please use pushNotificationWithTitle:message: as a class method");
 }
 
 /*! display a notification with given type
