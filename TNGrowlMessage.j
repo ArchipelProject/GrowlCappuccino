@@ -30,14 +30,14 @@
 
 + (TNGrowlMessage)growlMessageWithTitle:(CPString)aTitle message:(CPString)aMessage icon:(CPImage)anIcon
 {
-    var message = [[TNGrowlMessage alloc] init];
-    
-    [message setTitle:aTitle];
-    [message setMessage:aMessage];
-    [message setIcon:anIcon];
-    [message setDate:[CPDate date]];
-    
-    return message;
+    var growlMessage = [[TNGrowlMessage alloc] init];
+
+    [growlMessage setTitle:aTitle];
+    [growlMessage setMessage:aMessage];
+    [growlMessage setIcon:anIcon];
+    [growlMessage setDate:[CPDate date]];
+
+    return growlMessage;
 }
 
 @end
