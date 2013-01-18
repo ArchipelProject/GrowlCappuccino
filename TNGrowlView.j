@@ -26,6 +26,10 @@
 @import <AppKit/CPView.j>
 
 
+@global TNGrowlIconInfo
+@global TNGrowlIconWarning
+@global TNGrowlIconError
+@global TNGrowlPlacementHeight
 
 /*! @global
     @group TNGrowlNotification
