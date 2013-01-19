@@ -104,7 +104,7 @@ var _TNGrowlIconInfo,
     int         _maxHistory                         @accessors(property=maxHistory);
 
     CPArray     _notifications;
-    CPRect      _notificationFrame;
+    CGRect      _notificationFrame;
 }
 
 
@@ -249,7 +249,7 @@ var _TNGrowlIconInfo,
     var center      = [CPNotificationCenter defaultCenter],
         notifView   = [[TNGrowlView alloc] initWithFrame:_notificationFrame title:aTitle message:aMessage icon:anIcon lifeTime:_defaultLifeTime],
         frame       = [_view frame],
-        notifFrame  = CPRectCreateCopy(_notificationFrame),
+        notifFrame  = CGRectCreateCopy(_notificationFrame),
         animParams  = [CPDictionary dictionaryWithObjectsAndKeys:notifView, CPViewAnimationTargetKey, CPViewAnimationFadeInEffect, CPViewAnimationEffectKey],
         anim        = [[CPViewAnimation alloc] initWithViewAnimations:[animParams]];
 

@@ -68,7 +68,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     @param aBackground the background of TNGrowlView
     @return initialized instance of TNGrowlView
 */
-- (id)initWithFrame:(CPRect)aFrame title:(CPString)aTitle message:(CPString)aMessage icon:(id)anIcon lifeTime:(float)aLifeTime
+- (id)initWithFrame:(CGRect)aFrame title:(CPString)aTitle message:(CPString)aMessage icon:(id)anIcon lifeTime:(float)aLifeTime
 {
     if (self = [super initWithFrame:aFrame])
     {
