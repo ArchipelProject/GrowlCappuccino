@@ -25,11 +25,27 @@
 @import <AppKit/CPTextField.j>
 @import <AppKit/CPView.j>
 
-
-@global TNGrowlIconInfo
-@global TNGrowlIconWarning
-@global TNGrowlIconError
 @global TNGrowlPlacementHeight
+
+
+/*! @global
+    @group TNGrowlIcon
+    icon identitier for Info
+*/
+TNGrowlIconInfo     = @"TNGrowlIconInfo";
+
+/*! @global
+    @group TNGrowlIcon
+    icon identitier for Error
+*/
+TNGrowlIconError    = @"TNGrowlIconError";
+
+/*! @global
+    @group TNGrowlIcon
+    icon identitier for Warning
+*/
+TNGrowlIconWarning  = @"TNGrowlIconWarning";
+
 
 /*! @global
     @group TNGrowlNotification

@@ -33,24 +33,6 @@
 TNGrowlDefaultCenter                    = nil;
 
 /*! @global
-    @group TNGrowlIcon
-    icon identitier for Info
-*/
-TNGrowlIconInfo     = @"TNGrowlIconInfo";
-
-/*! @global
-    @group TNGrowlIcon
-    icon identitier for Error
-*/
-TNGrowlIconError    = @"TNGrowlIconError";
-
-/*! @global
-    @group TNGrowlIcon
-    icon identitier for Warning
-*/
-TNGrowlIconWarning  = @"TNGrowlIconWarning";
-
-/*! @global
     @group TNGrowlPlacement
     the height of TNGrowlView
 */
