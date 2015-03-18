@@ -220,7 +220,7 @@ TNGrowlViewLifeTimeExpirationNotification   = @"TNGrowlViewLifeTimeExpirationNot
     return @"growl-view";
 }
 
-+ (id)themeAttributes
++ (CPDictionary)themeAttributes
 {
     var bundle = [CPBundle bundleForClass:[self class]],
         backgroundImage = [CPColor colorWithPatternImage:[[CPNinePartImage alloc] initWithImageSlices:[
