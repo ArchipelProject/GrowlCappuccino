@@ -22,6 +22,7 @@
 
 @import <AppKit/CPView.j>
 @import <AppKit/CPViewAnimation.j>
+@import <AppKit/CPTableView.j>
 
 @import "TNGrowlMessage.j"
 @import "TNGrowlView.j"
